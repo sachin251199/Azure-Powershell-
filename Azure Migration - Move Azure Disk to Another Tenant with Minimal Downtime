@@ -1,0 +1,35 @@
+Connects to an Azure account using service principal credentials.
+Copies a virtual hard disk (VHD) from a source URI to a destination storage account and container.
+Let's break down the code step by step:
+
+Setting up Azure account credentials:
+
+
+$TenantID = "enter-tenant-id-here"
+$ApplicationID = "enter-application-id-here"
+$ApplicationSecret = "enter-application-id-secret-here"
+$SecurePassword = ConvertTo-SecureString "$ApplicationSecret" -AsPlainText -Force
+$AzureCredentials = New-Object System.Management.Automation.PSCredential ("$ApplicationID", $SecurePassword)
+Connect-AzAccount -ServicePrincipal -Tenant $TenantID -Credential $AzureCredentials -Force
+
+In this section, the script sets up the Azure AD application credentials using the tenant ID, application ID, and application secret. It then connects to the Azure account using these service principal credentials.
+
+Copying a VHD from a source URI to a destination storage account and container:
+
+$sourcediskexporturi = "enter-disk-uri"
+$destinationstorageaccoutname = "enter-storageaccount-name"
+$destinationstoragekey = "enter-storageaccount-primary-key"
+$destinationstoragecontainer = "enter-destination-containername"
+$destinationdiskname = "enterdiskname.vhd"
+
+$destinationContext = New-AzureStorageContext -StorageAccountName $destinationstorageaccoutname -StorageAccountKey $destinationstoragekey
+Start-AzureStorageBlobCopy -AbsoluteUri $sourcediskexporturi -DestContainer $destinationstoragecontainer -DestContext $destinationContext -DestBlob $destinationdiskname
+
+In this section, the script sets the source VHD URI, destination storage account name, primary key, destination container name, and the desired destination disk name (including the .vhd extension).
+
+Checking the status of the copy operation:
+
+Get-AzureStorageBlobCopyState -Blob $destinationdiskname -Container $destinationstoragecontainer -Context $destinationContext
+
+
+
